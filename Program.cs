@@ -3,16 +3,26 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
+using Microsoft.Extensions.Configuration;
+
+
 
 namespace Bot
 {
     class Program
     {
-        public static ITelegramBotClient _botClient = new TelegramBotClient("8069740478:AAHM6WcbmqyvbpLDeh6HMTYEP-Vu2VRhnjQ");
-        
+
 
         static async Task Main(string[] args)
         {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var botToken = config["BotConfiguration:BotToken"];
+            var _botClient = new TelegramBotClient(botToken);
+            
+            
             var me = await _botClient.GetMe();
             Console.WriteLine($"Бот запущен: @{me.Username}");
 
@@ -21,7 +31,7 @@ namespace Bot
             errorHandler: HandleError,
             receiverOptions: null,
             cancellationToken: new CancellationTokenSource().Token
-        );
+            );
 
             Console.WriteLine("Бот слушает сообщения...");
             Console.ReadLine();
@@ -47,7 +57,7 @@ namespace Bot
             }
         }
 
-            private static Task HandleError(ITelegramBotClient bot, Exception ex, CancellationToken ct)
+        private static Task HandleError(ITelegramBotClient bot, Exception ex, CancellationToken ct)
         {
             Console.WriteLine($"Ошибка: {ex.Message}");
             return Task.CompletedTask;
